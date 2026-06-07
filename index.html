@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frequência de Itens | Satisfactory</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Satisfactory</p>
+      <h1>Frequência de Itens</h1>
+      <p class="subtitle">Catálogo visual com busca, filtros por faixa e cópia rápida da frequência.</p>
+    </div>
+    <div class="stats">
+      <span id="totalItens">0</span>
+      <small>itens cadastrados</small>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <label class="searchBox">
+        <span>Buscar item</span>
+        <input id="search" type="search" placeholder="Ex.: Motor, Bauxita, Placa..." autocomplete="off">
+      </label>
+      <label class="selectBox">
+        <span>Faixa</span>
+        <select id="rangeFilter">
+          <option value="all">Todas as frequências</option>
+        </select>
+      </label>
+      <label class="selectBox">
+        <span>Ordenar</span>
+        <select id="sortBy">
+          <option value="name">Nome A-Z</option>
+          <option value="freqAsc">Frequência menor</option>
+          <option value="freqDesc">Frequência maior</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="resultInfo">
+      <span id="resultCount"></span>
+      <button id="clearFilters" class="ghost">Limpar filtros</button>
+    </section>
+
+    <section id="grid" class="grid"></section>
+  </main>
+
+  <div id="toast" class="toast">Frequência copiada!</div>
+
+  <template id="cardTemplate">
+    <article class="card">
+      <div class="imageWrap"></div>
+      <div class="cardBody">
+        <h2></h2>
+        <p class="freqLabel">Frequência</p>
+        <button class="freqBtn" title="Copiar frequência"></button>
+      </div>
+    </article>
+  </template>
+
+  <script src="items.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

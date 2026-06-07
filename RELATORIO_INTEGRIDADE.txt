@@ -1,0 +1,14 @@
+Itens adicionados:
+- Munição Guiada de Fuzil | freq 7314 | img/municao-guiada-de-fuzil.png
+- Nobelisco | freq 6847 | img/nobelisco-1.png
+- Nobelisco de Fragmentação | freq 4186 | img/nobelisco-de-fragmentacao.png
+- Nobelisco de Pulso | freq 7594 | img/nobelisco-de-pulso.png
+- Nobelisco Venenoso | freq 3968 | img/nobelisco-venenoso.png
+- Solução de Sílica | freq 6479 | img/solucao-de-silica.png
+- Vergalhão de Estilhaços | freq 5483 | img/vergalhao-de-estilhacos.png
+- Vergalhão Explosivo | freq 8396 | img/vergalhao-explosivo.png
+
+Total de itens: 0
+Total de imagens: 152
+Imagens faltando: 0
+Imagens sem uso: 0

@@ -1,0 +1,6 @@
+Site simples de Frequência de Itens do Satisfactory.
+
+Abra o arquivo index.html no navegador.
+Para adicionar/editar dados, altere items.js ou me envie uma nova tabela.
+
+Itens sem imagem correspondente: Carcaça de Alumínio, Thoriuum
