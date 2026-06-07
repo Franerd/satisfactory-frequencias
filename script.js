@@ -98,12 +98,60 @@ const generateFreq = document.querySelector('#generateFreq');
 const saveGithubConfig = document.querySelector('#saveGithubConfig');
 const addItemGithub = document.querySelector('#addItemGithub');
 const adminStatus = document.querySelector('#adminStatus');
-const toggleAdmin = document.querySelector('#toggleAdmin');
 const adminPanel = document.querySelector('#adminPanel');
+const adminAccess = document.querySelector('#adminAccess');
+const openAdminLogin = document.querySelector('#openAdminLogin');
+const adminLoginBox = document.querySelector('#adminLoginBox');
+const adminPassword = document.querySelector('#adminPassword');
+const adminLoginBtn = document.querySelector('#adminLoginBtn');
+const adminLoginStatus = document.querySelector('#adminLoginStatus');
+const adminLogout = document.querySelector('#adminLogout');
+
+// Senha simples para esconder o painel de visitantes comuns.
+// Atenção: em GitHub Pages isso não é segurança real, pois o JS é público.
+const ADMIN_PASSWORD = 'admin123';
 
 function setAdminStatus(message, type = ''){
   adminStatus.textContent = message;
   adminStatus.className = `adminStatus ${type}`.trim();
+}
+
+function setAdminLoginStatus(message, type = ''){
+  adminLoginStatus.textContent = message;
+  adminLoginStatus.className = `adminStatus ${type}`.trim();
+}
+
+function showAdminPanel(){
+  adminPanel.classList.remove('hidden');
+  adminAccess.classList.add('hidden');
+  localStorage.setItem('satisfactoryAdminUnlocked', 'true');
+}
+
+function hideAdminPanel(){
+  adminPanel.classList.add('hidden');
+  adminAccess.classList.remove('hidden');
+  adminLoginBox.classList.add('hidden');
+  adminPassword.value = '';
+  setAdminLoginStatus('');
+  localStorage.removeItem('satisfactoryAdminUnlocked');
+}
+
+function tryAdminLogin(){
+  if(adminPassword.value === ADMIN_PASSWORD){
+    showAdminPanel();
+  } else {
+    setAdminLoginStatus('Senha incorreta.', 'error');
+    adminPassword.focus();
+  }
+}
+
+function initAdminLogin(){
+  if(localStorage.getItem('satisfactoryAdminUnlocked') === 'true'){
+    showAdminPanel();
+    return;
+  }
+
+  hideAdminPanel();
 }
 
 function loadGithubConfig(){
@@ -380,10 +428,16 @@ newItemFreq?.addEventListener('input', () => {
   if(error) setAdminStatus(error, 'error');
 });
 addItemGithub?.addEventListener('click', addItemToGithub);
-toggleAdmin?.addEventListener('click', () => {
-  adminPanel.classList.toggle('collapsed');
-  toggleAdmin.textContent = adminPanel.classList.contains('collapsed') ? 'Mostrar painel' : 'Ocultar painel';
+openAdminLogin?.addEventListener('click', () => {
+  adminLoginBox.classList.toggle('hidden');
+  if(!adminLoginBox.classList.contains('hidden')) adminPassword.focus();
 });
+adminLoginBtn?.addEventListener('click', tryAdminLogin);
+adminPassword?.addEventListener('keydown', (event) => {
+  if(event.key === 'Enter') tryAdminLogin();
+});
+adminLogout?.addEventListener('click', hideAdminPanel);
 
 loadGithubConfig();
 suggestInitialFrequency();
+initAdminLogin();

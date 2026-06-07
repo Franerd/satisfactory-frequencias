@@ -5,3 +5,5 @@
 
 .generateFreq{position:relative;z-index:10;pointer-events:auto;min-width:82px}
 .freqInputRow{position:relative;z-index:2}
+
+.hidden{display:none!important}.adminAccess{display:flex;justify-content:flex-end;align-items:flex-start;gap:12px;margin:0 0 24px}.adminOpenBtn{opacity:.75}.adminLoginBox{width:min(100%,420px);padding:16px;background:rgba(255,255,255,.055);border:1px solid rgba(255,157,35,.22);border-radius:18px;box-shadow:0 14px 35px rgba(0,0,0,.18)}.adminLoginBtn{width:100%;margin-top:12px;font-size:16px}.adminLoginBox .adminStatus{display:block;margin-top:10px}@media(max-width:760px){.adminAccess{display:block}.adminOpenBtn{margin-bottom:12px}.adminLoginBox{width:100%}}

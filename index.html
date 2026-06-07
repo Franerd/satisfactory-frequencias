@@ -46,16 +46,27 @@
       <button id="clearFilters" class="ghost">Limpar filtros</button>
     </section>
 
+    <section class="adminAccess" id="adminAccess">
+      <button id="openAdminLogin" class="ghost adminOpenBtn" type="button">Admin</button>
 
+      <div id="adminLoginBox" class="adminLoginBox hidden">
+        <label>
+          <span>Senha de administrador</span>
+          <input id="adminPassword" type="password" placeholder="Digite a senha">
+        </label>
+        <button id="adminLoginBtn" class="freqBtn adminLoginBtn" type="button">Entrar</button>
+        <span id="adminLoginStatus" class="adminStatus"></span>
+      </div>
+    </section>
 
-    <section class="adminPanel" id="adminPanel">
+    <section class="adminPanel hidden" id="adminPanel">
       <div class="adminHead">
         <div>
           <p class="eyebrow">Admin</p>
           <h2>Adicionar item pelo site</h2>
           <p>Envia a imagem para a pasta <strong>img</strong> e atualiza o <strong>items.js</strong> direto no GitHub.</p>
         </div>
-        <button id="toggleAdmin" class="ghost" type="button">Ocultar painel</button>
+        <button id="adminLogout" class="ghost" type="button">Sair do Admin</button>
       </div>
 
       <div class="adminGrid">
