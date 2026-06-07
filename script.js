@@ -137,21 +137,28 @@ function findItemByFrequency(freq, items = ITEMS){
   return items.find(item => Number(item.freqNum || item.freq) === target);
 }
 
+const MIN_FREQUENCY_DISTANCE = 50;
+
 function gerarFrequenciaUnica(items = ITEMS){
   const usadas = getUsedFrequencies(items);
 
-  const numerosOrdenados = [...usadas].sort((a, b) => a - b);
-  const maior = numerosOrdenados.length ? numerosOrdenados[numerosOrdenados.length - 1] : 999;
-
-  for(let freq = Math.max(1000, maior + 1); freq <= 9999; freq++){
-    if(!usadas.has(freq)) return freq;
-  }
-
+  const candidatos = [];
   for(let freq = 1000; freq <= 9999; freq++){
-    if(!usadas.has(freq)) return freq;
+    if(usadas.has(freq)) continue;
+
+    const longeDasUsadas = [...usadas].every(usada =>
+      Math.abs(usada - freq) >= MIN_FREQUENCY_DISTANCE
+    );
+
+    if(longeDasUsadas) candidatos.push(freq);
   }
 
-  throw new Error('Todas as frequências de 1000 a 9999 já estão em uso.');
+  if(!candidatos.length){
+    throw new Error(`Não há frequência livre com distância mínima de ${MIN_FREQUENCY_DISTANCE}.`);
+  }
+
+  const indiceAleatorio = Math.floor(Math.random() * candidatos.length);
+  return candidatos[indiceAleatorio];
 }
 
 function preencherFrequenciaUnica(items = ITEMS){
@@ -163,6 +170,8 @@ function preencherFrequenciaUnica(items = ITEMS){
   }
 }
 
+window.preencherFrequenciaUnica = preencherFrequenciaUnica;
+
 function validateFrequency(freq, items = ITEMS, itemName = ''){
   const freqNumber = Number(freq);
   if(!Number.isInteger(freqNumber) || freqNumber < 1000 || freqNumber > 9999){
@@ -173,6 +182,15 @@ function validateFrequency(freq, items = ITEMS, itemName = ''){
   const sameItem = repeated && itemName && normalizeText(repeated.item) === normalizeText(itemName);
   if(repeated && !sameItem){
     return `A frequência ${freqNumber} já está em uso no item "${repeated.item}".`;
+  }
+
+  const tooClose = items.find(item => {
+    const existing = Number(item.freqNum || item.freq);
+    return Number.isInteger(existing) && Math.abs(existing - freqNumber) < MIN_FREQUENCY_DISTANCE;
+  });
+
+  if(tooClose && normalizeText(tooClose.item) !== normalizeText(itemName)){
+    return `A frequência ${freqNumber} está muito próxima da frequência ${tooClose.freq} do item "${tooClose.item}". Use uma distância mínima de ${MIN_FREQUENCY_DISTANCE}.`;
   }
 
   return '';
@@ -352,7 +370,11 @@ async function addItemToGithub(){
 }
 
 saveGithubConfig?.addEventListener('click', saveConfig);
-generateFreq?.addEventListener('click', () => preencherFrequenciaUnica());
+generateFreq?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  preencherFrequenciaUnica();
+});
 newItemFreq?.addEventListener('input', () => {
   const error = validateFrequency(newItemFreq.value, ITEMS, newItemName.value.trim());
   if(error) setAdminStatus(error, 'error');
