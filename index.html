@@ -84,7 +84,10 @@
         </label>
         <label>
           <span>Frequência</span>
-          <input id="newItemFreq" type="number" placeholder="Ex.: 8265">
+          <div class="freqInputRow">
+            <input id="newItemFreq" type="number" min="1000" max="9999" placeholder="Ex.: 8265">
+            <button id="generateFreq" class="ghost generateFreq" type="button">Gerar</button>
+          </div>
         </label>
         <label>
           <span>Imagem PNG/JPG/WEBP</span>

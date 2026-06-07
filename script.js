@@ -94,6 +94,7 @@ const ghToken = document.querySelector('#ghToken');
 const newItemName = document.querySelector('#newItemName');
 const newItemFreq = document.querySelector('#newItemFreq');
 const newItemImage = document.querySelector('#newItemImage');
+const generateFreq = document.querySelector('#generateFreq');
 const saveGithubConfig = document.querySelector('#saveGithubConfig');
 const addItemGithub = document.querySelector('#addItemGithub');
 const adminStatus = document.querySelector('#adminStatus');
@@ -121,6 +122,66 @@ function saveConfig(){
     token: ghToken.value.trim()
   }));
   setAdminStatus('Configuração salva neste navegador.', 'ok');
+}
+
+function getUsedFrequencies(items = ITEMS){
+  return new Set(
+    items
+      .map(item => Number(item.freqNum || item.freq))
+      .filter(num => Number.isInteger(num) && num >= 1000 && num <= 9999)
+  );
+}
+
+function findItemByFrequency(freq, items = ITEMS){
+  const target = Number(freq);
+  return items.find(item => Number(item.freqNum || item.freq) === target);
+}
+
+function gerarFrequenciaUnica(items = ITEMS){
+  const usadas = getUsedFrequencies(items);
+
+  const numerosOrdenados = [...usadas].sort((a, b) => a - b);
+  const maior = numerosOrdenados.length ? numerosOrdenados[numerosOrdenados.length - 1] : 999;
+
+  for(let freq = Math.max(1000, maior + 1); freq <= 9999; freq++){
+    if(!usadas.has(freq)) return freq;
+  }
+
+  for(let freq = 1000; freq <= 9999; freq++){
+    if(!usadas.has(freq)) return freq;
+  }
+
+  throw new Error('Todas as frequências de 1000 a 9999 já estão em uso.');
+}
+
+function preencherFrequenciaUnica(items = ITEMS){
+  try{
+    newItemFreq.value = gerarFrequenciaUnica(items);
+    setAdminStatus('Frequência única gerada.', 'ok');
+  } catch(err){
+    setAdminStatus(`Erro: ${err.message}`, 'error');
+  }
+}
+
+function validateFrequency(freq, items = ITEMS, itemName = ''){
+  const freqNumber = Number(freq);
+  if(!Number.isInteger(freqNumber) || freqNumber < 1000 || freqNumber > 9999){
+    return 'A frequência precisa ser um número de 4 dígitos entre 1000 e 9999.';
+  }
+
+  const repeated = findItemByFrequency(freqNumber, items);
+  const sameItem = repeated && itemName && normalizeText(repeated.item) === normalizeText(itemName);
+  if(repeated && !sameItem){
+    return `A frequência ${freqNumber} já está em uso no item "${repeated.item}".`;
+  }
+
+  return '';
+}
+
+function suggestInitialFrequency(){
+  if(!newItemFreq.value){
+    try{ newItemFreq.value = gerarFrequenciaUnica(); } catch {}
+  }
 }
 
 function slugifyFileName(text){
@@ -220,6 +281,8 @@ async function addItemToGithub(){
 
   if(!owner || !repo || !token || !branch) return setAdminStatus('Preencha dono, repositório, branch e token.', 'error');
   if(!itemName || !freq) return setAdminStatus('Preencha nome do item e frequência.', 'error');
+  const localFreqError = validateFrequency(freq, ITEMS, itemName);
+  if(localFreqError) return setAdminStatus(localFreqError, 'error');
   if(!file) return setAdminStatus('Selecione uma imagem.', 'error');
 
   addItemGithub.disabled = true;
@@ -250,6 +313,9 @@ async function addItemToGithub(){
     const itemsFile = await getGithubFile('items.js');
     const itemsJs = decodeBase64Utf8(itemsFile.content);
     const items = extractItemsFromJs(itemsJs);
+    const remoteFreqError = validateFrequency(freq, items, itemName);
+    if(remoteFreqError) throw new Error(remoteFreqError);
+
     const newItem = {
       item: itemName,
       freq: String(freq),
@@ -277,6 +343,7 @@ async function addItemToGithub(){
     newItemName.value = '';
     newItemFreq.value = '';
     newItemImage.value = '';
+    preencherFrequenciaUnica(items);
   } catch(err){
     setAdminStatus(`Erro: ${err.message}`, 'error');
   } finally {
@@ -285,6 +352,11 @@ async function addItemToGithub(){
 }
 
 saveGithubConfig?.addEventListener('click', saveConfig);
+generateFreq?.addEventListener('click', () => preencherFrequenciaUnica());
+newItemFreq?.addEventListener('input', () => {
+  const error = validateFrequency(newItemFreq.value, ITEMS, newItemName.value.trim());
+  if(error) setAdminStatus(error, 'error');
+});
 addItemGithub?.addEventListener('click', addItemToGithub);
 toggleAdmin?.addEventListener('click', () => {
   adminPanel.classList.toggle('collapsed');
@@ -292,3 +364,4 @@ toggleAdmin?.addEventListener('click', () => {
 });
 
 loadGithubConfig();
+suggestInitialFrequency();
