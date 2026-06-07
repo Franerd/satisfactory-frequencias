@@ -97,7 +97,7 @@ const ITEMS = [
   },
   {
     "item": "Carcaça de Alumínio",
-    "freq": "1427 / 333",
+    "freq": "1427",
     "image": "img/carcaca-de-aluminio.png",
     "freqNum": 0
   },
@@ -175,7 +175,7 @@ const ITEMS = [
   },
   {
     "item": "Computador",
-    "freq": "4723 / 4722",
+    "freq": "4723",
     "image": "img/computador-1.png",
     "freqNum": 0
   },
@@ -493,7 +493,7 @@ const ITEMS = [
   },
   {
     "item": "Lixo de Urânio",
-    "freq": "2849 / 2848",
+    "freq": "2849",
     "image": "img/lixo-de-uranio.png",
     "freqNum": 0
   },
@@ -643,7 +643,7 @@ const ITEMS = [
   },
   {
     "item": "Plástico",
-    "freq": "3621 / 3622 / 3623",
+    "freq": "3621",
     "image": "img/plastico.png",
     "freqNum": 0
   },
