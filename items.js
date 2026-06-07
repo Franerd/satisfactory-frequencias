@@ -168,6 +168,12 @@ const ITEMS = [
     "freqNum": 3821
   },
   {
+    "item": "Célula fotovoltaica",
+    "freq": "5569",
+    "image": "img/celula-fotovoltaica.png",
+    "freqNum": 5569
+  },
+  {
     "item": "Chapa Avançada",
     "freq": "4278",
     "image": "img/chapa-avancada.png",
