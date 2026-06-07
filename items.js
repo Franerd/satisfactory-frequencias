@@ -204,6 +204,12 @@ const ITEMS = [
     "freqNum": 4278
   },
   {
+    "item": "Cilindro de CO2",
+    "freq": "3412",
+    "image": "img/cilindro-de-co2.png",
+    "freqNum": 3412
+  },
+  {
     "item": "Combustível",
     "freq": "6713",
     "image": "img/combustivel.png",
