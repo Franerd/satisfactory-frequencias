@@ -118,6 +118,51 @@
     <section id="grid" class="grid"></section>
   </main>
 
+
+  <div id="imageUpdateModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="imageUpdateTitle">
+    <div class="modalBox">
+      <div class="modalHead">
+        <div>
+          <p class="eyebrow">Admin</p>
+          <h2 id="imageUpdateTitle">Substituir imagem</h2>
+          <p id="imageUpdateItemName" class="modalSubtitle"></p>
+        </div>
+        <button id="closeImageUpdateModal" class="ghost" type="button">Fechar</button>
+      </div>
+
+      <div class="imageCompare">
+        <div>
+          <span>Imagem atual</span>
+          <div class="previewBox">
+            <img id="currentImagePreview" alt="Imagem atual">
+          </div>
+          <small id="currentImagePath"></small>
+        </div>
+        <div>
+          <span>Nova imagem</span>
+          <div class="previewBox">
+            <img id="newImagePreview" class="hidden" alt="Nova imagem">
+            <p id="newImagePlaceholder">Selecione uma imagem para visualizar.</p>
+          </div>
+          <small>Ela será salva usando o mesmo nome da imagem atual.</small>
+        </div>
+      </div>
+
+      <label class="modalFileInput">
+        <span>Escolher nova imagem PNG/JPG/WEBP</span>
+        <input id="replaceImageFile" type="file" accept="image/png,image/jpeg,image/webp">
+      </label>
+
+      <div class="modalActions">
+        <button id="confirmReplaceImage" class="freqBtn adminSave" type="button">Substituir imagem existente</button>
+        <span id="replaceImageStatus" class="adminStatus"></span>
+      </div>
+
+      <p class="adminWarning">Fluxo seguro: a nova imagem sobrescreve o arquivo atual no GitHub. O items.js não é alterado.</p>
+    </div>
+  </div>
+
+
   <div id="toast" class="toast">Frequência copiada!</div>
 
   <template id="cardTemplate">

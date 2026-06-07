@@ -70,6 +70,16 @@ function render(){
     const btn = node.querySelector('.freqBtn');
     btn.textContent = item.freq;
     btn.addEventListener('click', () => copyFreq(item.freq));
+
+    if(isAdminUnlocked() && item.image){
+      const changeImageBtn = document.createElement('button');
+      changeImageBtn.className = 'ghost changeImageBtn';
+      changeImageBtn.type = 'button';
+      changeImageBtn.textContent = 'Trocar imagem';
+      changeImageBtn.addEventListener('click', () => openImageModal(item));
+      node.querySelector('.cardBody').appendChild(changeImageBtn);
+    }
+
     grid.appendChild(node);
   }
   resultCount.textContent = `${list.length} item(ns) encontrado(s)`;
@@ -106,6 +116,19 @@ const adminPassword = document.querySelector('#adminPassword');
 const adminLoginBtn = document.querySelector('#adminLoginBtn');
 const adminLoginStatus = document.querySelector('#adminLoginStatus');
 const adminLogout = document.querySelector('#adminLogout');
+const imageUpdateModal = document.querySelector('#imageUpdateModal');
+const closeImageUpdateModal = document.querySelector('#closeImageUpdateModal');
+const imageUpdateItemName = document.querySelector('#imageUpdateItemName');
+const currentImagePreview = document.querySelector('#currentImagePreview');
+const currentImagePath = document.querySelector('#currentImagePath');
+const replaceImageFile = document.querySelector('#replaceImageFile');
+const newImagePreview = document.querySelector('#newImagePreview');
+const newImagePlaceholder = document.querySelector('#newImagePlaceholder');
+const confirmReplaceImage = document.querySelector('#confirmReplaceImage');
+const replaceImageStatus = document.querySelector('#replaceImageStatus');
+
+let selectedImageItem = null;
+
 
 // Senha simples para esconder o painel de visitantes comuns.
 // Atenção: em GitHub Pages isso não é segurança real, pois o JS é público.
@@ -121,10 +144,20 @@ function setAdminLoginStatus(message, type = ''){
   adminLoginStatus.className = `adminStatus ${type}`.trim();
 }
 
+function setReplaceImageStatus(message, type = ''){
+  replaceImageStatus.textContent = message;
+  replaceImageStatus.className = `adminStatus ${type}`.trim();
+}
+
+function isAdminUnlocked(){
+  return localStorage.getItem('satisfactoryAdminUnlocked') === 'true';
+}
+
 function showAdminPanel(){
   adminPanel.classList.remove('hidden');
   adminAccess.classList.add('hidden');
   localStorage.setItem('satisfactoryAdminUnlocked', 'true');
+  render();
 }
 
 function hideAdminPanel(){
@@ -134,6 +167,8 @@ function hideAdminPanel(){
   adminPassword.value = '';
   setAdminLoginStatus('');
   localStorage.removeItem('satisfactoryAdminUnlocked');
+  closeImageModal();
+  render();
 }
 
 function tryAdminLogin(){
@@ -336,6 +371,96 @@ async function getGithubFile(path){
   return githubRequest(`${path}?ref=${encodeURIComponent(ghBranch.value.trim() || 'main')}`);
 }
 
+function openImageModal(item){
+  selectedImageItem = item;
+  replaceImageFile.value = '';
+  newImagePreview.src = '';
+  newImagePreview.classList.add('hidden');
+  newImagePlaceholder.classList.remove('hidden');
+  setReplaceImageStatus('');
+
+  imageUpdateItemName.textContent = item.item;
+  currentImagePreview.src = `${item.image}?preview=${Date.now()}`;
+  currentImagePreview.alt = item.item;
+  currentImagePath.textContent = item.image;
+
+  imageUpdateModal.classList.remove('hidden');
+}
+
+function closeImageModal(){
+  if(!imageUpdateModal) return;
+  imageUpdateModal.classList.add('hidden');
+  selectedImageItem = null;
+  if(replaceImageFile) replaceImageFile.value = '';
+  setReplaceImageStatus('');
+}
+
+function previewReplacementImage(){
+  const file = replaceImageFile.files[0];
+  if(!file){
+    newImagePreview.src = '';
+    newImagePreview.classList.add('hidden');
+    newImagePlaceholder.classList.remove('hidden');
+    return;
+  }
+
+  const url = URL.createObjectURL(file);
+  newImagePreview.src = url;
+  newImagePreview.classList.remove('hidden');
+  newImagePlaceholder.classList.add('hidden');
+}
+
+async function replaceExistingImageOnGithub(){
+  const owner = ghOwner.value.trim();
+  const repo = ghRepo.value.trim();
+  const token = ghToken.value.trim();
+  const branch = ghBranch.value.trim() || 'main';
+  const file = replaceImageFile.files[0];
+
+  if(!selectedImageItem) return setReplaceImageStatus('Nenhum item selecionado.', 'error');
+  if(!owner || !repo || !token || !branch) return setReplaceImageStatus('Preencha dono, repositório, branch e token no painel admin.', 'error');
+  if(!selectedImageItem.image) return setReplaceImageStatus('Este item não possui imagem cadastrada para substituir.', 'error');
+  if(!file) return setReplaceImageStatus('Selecione a nova imagem.', 'error');
+
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+  if(file.type && !allowedTypes.includes(file.type)){
+    return setReplaceImageStatus('Use uma imagem PNG, JPG ou WEBP.', 'error');
+  }
+
+  const imagePath = selectedImageItem.image.replace(/^\/+/, '');
+
+  confirmReplaceImage.disabled = true;
+  setReplaceImageStatus('Buscando arquivo atual no GitHub...', 'loading');
+
+  try{
+    saveConfig();
+
+    const existingImage = await getGithubFile(imagePath);
+    const imageContent = await fileToBase64(file);
+
+    setReplaceImageStatus('Substituindo imagem existente...', 'loading');
+
+    await putGithubFile(
+      imagePath,
+      imageContent,
+      `Substitui imagem: ${selectedImageItem.item}`,
+      existingImage.sha
+    );
+
+    setReplaceImageStatus('Imagem substituída com sucesso. O GitHub Pages pode levar alguns minutos para atualizar.', 'ok');
+    currentImagePreview.src = `${URL.createObjectURL(file)}`;
+    replaceImageFile.value = '';
+    newImagePreview.src = '';
+    newImagePreview.classList.add('hidden');
+    newImagePlaceholder.classList.remove('hidden');
+  } catch(err){
+    setReplaceImageStatus(`Erro: ${err.message}`, 'error');
+  } finally {
+    confirmReplaceImage.disabled = false;
+  }
+}
+
+
 async function addItemToGithub(){
   const owner = ghOwner.value.trim();
   const repo = ghRepo.value.trim();
@@ -437,6 +562,12 @@ adminPassword?.addEventListener('keydown', (event) => {
   if(event.key === 'Enter') tryAdminLogin();
 });
 adminLogout?.addEventListener('click', hideAdminPanel);
+closeImageUpdateModal?.addEventListener('click', closeImageModal);
+replaceImageFile?.addEventListener('change', previewReplacementImage);
+confirmReplaceImage?.addEventListener('click', replaceExistingImageOnGithub);
+imageUpdateModal?.addEventListener('click', (event) => {
+  if(event.target === imageUpdateModal) closeImageModal();
+});
 
 loadGithubConfig();
 suggestInitialFrequency();
