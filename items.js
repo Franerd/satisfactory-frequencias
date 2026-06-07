@@ -1,5 +1,23 @@
 const ITEMS = [
   {
+    "item": "Ácido Nítrico",
+    "freq": "5832",
+    "image": "img/acido-nitrico.png",
+    "freqNum": 5832
+  },
+  {
+    "item": "Ácido Sulfúrico",
+    "freq": "7631",
+    "image": "img/acido-sulfurico.png",
+    "freqNum": 7631
+  },
+  {
+    "item": "Água",
+    "freq": "2473",
+    "image": "img/agua.png",
+    "freqNum": 2473
+  },
+  {
     "item": "Armação Modular",
     "freq": "8265",
     "image": "img/armacao-modular.png",
@@ -96,16 +114,22 @@ const ITEMS = [
     "freqNum": 1157
   },
   {
-    "item": "Carcaça de Alumínio",
-    "freq": "1427 / 333",
-    "image": "img/carcaca-de-aluminio.png",
-    "freqNum": 0
-  },
-  {
     "item": "Calcário",
     "freq": "2563",
     "image": "img/calcario.png",
     "freqNum": 2563
+  },
+  {
+    "item": "Cápsula de DNA Alienígena",
+    "freq": "9475",
+    "image": "img/capsula-de-dna-alienigena.png",
+    "freqNum": 9475
+  },
+  {
+    "item": "Carcaça de Alumínio",
+    "freq": "1427 / 333",
+    "image": "img/carcaca-de-aluminio.png",
+    "freqNum": 0
   },
   {
     "item": "Cartucho de Cor",
@@ -124,6 +148,24 @@ const ITEMS = [
     "freq": "1854",
     "image": "img/carvao-compactado.png",
     "freqNum": 1854
+  },
+  {
+    "item": "Célula de Plutônio Revestida",
+    "freq": "1924",
+    "image": "img/celula-de-plutonio-revestida.png",
+    "freqNum": 1924
+  },
+  {
+    "item": "Célula de Singularidade",
+    "freq": "7249",
+    "image": "img/celula-de-singularidade.png",
+    "freqNum": 7249
+  },
+  {
+    "item": "Célula de Urânio Revestida",
+    "freq": "3821",
+    "image": "img/celula-de-uranio-revestida.png",
+    "freqNum": 3821
   },
   {
     "item": "Chapa Avançada",
@@ -162,16 +204,16 @@ const ITEMS = [
     "freqNum": 6713
   },
   {
-    "item": "Combustível Ionizado",
-    "freq": "9218",
-    "image": "img/combustivel-ionizado.png",
-    "freqNum": 9218
-  },
-  {
     "item": "Combustível de Foguete",
     "freq": "5719",
     "image": "img/combustivel-de-foguete.png",
     "freqNum": 5719
+  },
+  {
+    "item": "Combustível Ionizado",
+    "freq": "9218",
+    "image": "img/combustivel-ionizado.png",
+    "freqNum": 9218
   },
   {
     "item": "Computador",
@@ -228,36 +270,6 @@ const ITEMS = [
     "freqNum": 5064
   },
   {
-    "item": "Cápsula de DNA Alienígena",
-    "freq": "9475",
-    "image": "img/capsula-de-dna-alienigena.png",
-    "freqNum": 9475
-  },
-  {
-    "item": "Célula de Plutônio Revestida",
-    "freq": "1924",
-    "image": "img/celula-de-plutonio-revestida.png",
-    "freqNum": 1924
-  },
-  {
-    "item": "Célula de Singularidade",
-    "freq": "7249",
-    "image": "img/celula-de-singularidade.png",
-    "freqNum": 7249
-  },
-  {
-    "item": "Célula de Urânio Revestida",
-    "freq": "3821",
-    "image": "img/celula-de-uranio-revestida.png",
-    "freqNum": 3821
-  },
-  {
-    "item": "Thoriuum",
-    "freq": "3822",
-    "image": "img/thorium-1.png",
-    "freqNum": 3822
-  },
-  {
     "item": "Diamantes",
     "freq": "9512",
     "image": "img/diamantes-1.png",
@@ -268,6 +280,12 @@ const ITEMS = [
     "freq": "4932",
     "image": "img/dissipador-de-calor.png",
     "freqNum": 4932
+  },
+  {
+    "item": "DT Reactor Core",
+    "freq": "9835",
+    "image": "img/dt-reactor-core.png",
+    "freqNum": 9835
   },
   {
     "item": "Enxofre",
@@ -360,42 +378,6 @@ const ITEMS = [
     "freqNum": 1438
   },
   {
-    "item": "Galão de Biocombustível Líquido",
-    "freq": "2397",
-    "image": "img/galao-de-biocombustivel-liquido.png",
-    "freqNum": 2397
-  },
-  {
-    "item": "Galão de Combustível",
-    "freq": "6713",
-    "image": "img/galao-de-combustivel.png",
-    "freqNum": 6713
-  },
-  {
-    "item": "Galão de Combustível Ionizado",
-    "freq": "9218",
-    "image": "img/galao-de-combustivel-ionizado.png",
-    "freqNum": 9218
-  },
-  {
-    "item": "Galão de Combustível de Foguete",
-    "freq": "5719",
-    "image": "img/galao-de-combustivel-de-foguete.png",
-    "freqNum": 5719
-  },
-  {
-    "item": "Galão de Solução de Alumina",
-    "freq": "4297",
-    "image": "img/galao-de-solucao-de-alumina.png",
-    "freqNum": 4297
-  },
-  {
-    "item": "Galão de Turbocombustível",
-    "freq": "7631",
-    "image": "img/galao-de-turbocombustivel.png",
-    "freqNum": 7631
-  },
-  {
     "item": "Galão de Ácido Nítrico",
     "freq": "5832",
     "image": "img/galao-de-acido-nitrico.png",
@@ -414,16 +396,52 @@ const ITEMS = [
     "freqNum": 2473
   },
   {
-    "item": "Gerador de Campo Magnético",
-    "freq": "4981",
-    "image": "img/gerador-de-campo-magnetico.png",
-    "freqNum": 4981
+    "item": "Galão de Biocombustível Líquido",
+    "freq": "2397",
+    "image": "img/galao-de-biocombustivel-liquido.png",
+    "freqNum": 2397
+  },
+  {
+    "item": "Galão de Combustível",
+    "freq": "6713",
+    "image": "img/galao-de-combustivel.png",
+    "freqNum": 6713
+  },
+  {
+    "item": "Galão de Combustível de Foguete",
+    "freq": "5719",
+    "image": "img/galao-de-combustivel-de-foguete.png",
+    "freqNum": 5719
+  },
+  {
+    "item": "Galão de Combustível Ionizado",
+    "freq": "9218",
+    "image": "img/galao-de-combustivel-ionizado.png",
+    "freqNum": 9218
+  },
+  {
+    "item": "Galão de Solução de Alumina",
+    "freq": "4297",
+    "image": "img/galao-de-solucao-de-alumina.png",
+    "freqNum": 4297
+  },
+  {
+    "item": "Galão de Turbocombustível",
+    "freq": "7631",
+    "image": "img/galao-de-turbocombustivel.png",
+    "freqNum": 7631
   },
   {
     "item": "Gás Nitrogênio",
     "freq": "4892",
     "image": "img/gas-nitrogenio.png",
     "freqNum": 4892
+  },
+  {
+    "item": "Gerador de Campo Magnético",
+    "freq": "4981",
+    "image": "img/gerador-de-campo-magnetico.png",
+    "freqNum": 4981
   },
   {
     "item": "Lesma Elétrica Amarela",
@@ -450,16 +468,16 @@ const ITEMS = [
     "freqNum": 2319
   },
   {
-    "item": "Lingote de Alumínio",
-    "freq": "8904",
-    "image": "img/lingote-de-aluminio.png",
-    "freqNum": 8904
-  },
-  {
     "item": "Lingote de Aço",
     "freq": "9123",
     "image": "img/lingote-de-aco.png",
     "freqNum": 9123
+  },
+  {
+    "item": "Lingote de Alumínio",
+    "freq": "8904",
+    "image": "img/lingote-de-aluminio.png",
+    "freqNum": 8904
   },
   {
     "item": "Lingote de Catério",
@@ -498,6 +516,12 @@ const ITEMS = [
     "freqNum": 0
   },
   {
+    "item": "Madeira",
+    "freq": "5264",
+    "image": "img/madeira-1.png",
+    "freqNum": 5264
+  },
+  {
     "item": "MAE",
     "freq": "6197",
     "image": "img/mae-1.png",
@@ -510,28 +534,22 @@ const ITEMS = [
     "freqNum": 4897
   },
   {
-    "item": "Madeira",
-    "freq": "5264",
-    "image": "img/madeira-1.png",
-    "freqNum": 5264
-  },
-  {
     "item": "Massa Nuclear",
     "freq": "8916",
     "image": "img/massa-nuclear.png",
     "freqNum": 8916
   },
   {
-    "item": "Matriz de Energia Alienígena",
-    "freq": "6113",
-    "image": "img/matriz-de-energia-alienigena.png",
-    "freqNum": 6113
-  },
-  {
     "item": "Matéria Fotônica Energizada",
     "freq": "7392",
     "image": "img/materia-fotonica-energizada.png",
     "freqNum": 7392
+  },
+  {
+    "item": "Matriz de Energia Alienígena",
+    "freq": "6113",
+    "image": "img/matriz-de-energia-alienigena.png",
+    "freqNum": 6113
   },
   {
     "item": "Micélios",
@@ -564,6 +582,12 @@ const ITEMS = [
     "freqNum": 1273
   },
   {
+    "item": "Motor de Dobra Balístico",
+    "freq": "9832",
+    "image": "img/motor-de-dobra-balistico.png",
+    "freqNum": 9832
+  },
+  {
     "item": "Motor Modular",
     "freq": "7154",
     "image": "img/motor-modular.png",
@@ -574,12 +598,6 @@ const ITEMS = [
     "freq": "8147",
     "image": "img/motor-turbo.png",
     "freqNum": 8147
-  },
-  {
-    "item": "Motor de Dobra Balístico",
-    "freq": "9832",
-    "image": "img/motor-de-dobra-balistico.png",
-    "freqNum": 9832
   },
   {
     "item": "Munição de Fuzil",
@@ -594,10 +612,40 @@ const ITEMS = [
     "freqNum": 2784
   },
   {
+    "item": "Munição Guiada de Fuzil",
+    "freq": "7314",
+    "image": "img/municao-guiada-de-fuzil.png",
+    "freqNum": 7314
+  },
+  {
+    "item": "Nobelisco",
+    "freq": "6847",
+    "image": "img/nobelisco-1.png",
+    "freqNum": 6847
+  },
+  {
     "item": "Nobelisco Atômico",
     "freq": "9834",
     "image": "img/nobelisco-atomico.png",
     "freqNum": 9834
+  },
+  {
+    "item": "Nobelisco de Fragmentação",
+    "freq": "4186",
+    "image": "img/nobelisco-de-fragmentacao.png",
+    "freqNum": 4186
+  },
+  {
+    "item": "Nobelisco de Pulso",
+    "freq": "7594",
+    "image": "img/nobelisco-de-pulso.png",
+    "freqNum": 7594
+  },
+  {
+    "item": "Nobelisco Venenoso",
+    "freq": "3968",
+    "image": "img/nobelisco-venenoso.png",
+    "freqNum": 3968
   },
   {
     "item": "Oscilador de Cristal",
@@ -624,6 +672,12 @@ const ITEMS = [
     "freqNum": 2843
   },
   {
+    "item": "Pétalas de Flores",
+    "freq": "6519",
+    "image": "img/petalas-de-flores.png",
+    "freqNum": 6519
+  },
+  {
     "item": "Petróleo Bruto",
     "freq": "6842",
     "image": "img/petroleo-bruto.png",
@@ -648,24 +702,6 @@ const ITEMS = [
     "freqNum": 0
   },
   {
-    "item": "Processador Neuroquântico",
-    "freq": "9124",
-    "image": "img/processador-neuroquantico.png",
-    "freqNum": 9124
-  },
-  {
-    "item": "Proteína Alienígena",
-    "freq": "3628",
-    "image": "img/proteina-alienigena.png",
-    "freqNum": 3628
-  },
-  {
-    "item": "Pétalas de Flores",
-    "freq": "6519",
-    "image": "img/petalas-de-flores.png",
-    "freqNum": 6519
-  },
-  {
     "item": "Pó de Cobre",
     "freq": "1209",
     "image": "img/po-de-cobre.png",
@@ -684,6 +720,18 @@ const ITEMS = [
     "freqNum": 9624
   },
   {
+    "item": "Processador Neuroquântico",
+    "freq": "9124",
+    "image": "img/processador-neuroquantico.png",
+    "freqNum": 9124
+  },
+  {
+    "item": "Proteína Alienígena",
+    "freq": "3628",
+    "image": "img/proteina-alienigena.png",
+    "freqNum": 3628
+  },
+  {
     "item": "Quartzo Bruto",
     "freq": "9732",
     "image": "img/quartzo-bruto.png",
@@ -696,10 +744,10 @@ const ITEMS = [
     "freqNum": 8053
   },
   {
-    "item": "Resina de Polímero",
-    "freq": "7629",
-    "image": "img/resina-de-polimero.png",
-    "freqNum": 7629
+    "item": "Resíduo de Matéria Escura",
+    "freq": "8402",
+    "image": "img/residuo-de-materia-escura.png",
+    "freqNum": 8402
   },
   {
     "item": "Resíduo Pesado de Petróleo",
@@ -708,10 +756,10 @@ const ITEMS = [
     "freqNum": 3819
   },
   {
-    "item": "Resíduo de Matéria Escura",
-    "freq": "8402",
-    "image": "img/residuo-de-materia-escura.png",
-    "freqNum": 8402
+    "item": "Resina de Polímero",
+    "freq": "7629",
+    "image": "img/resina-de-polimero.png",
+    "freqNum": 7629
   },
   {
     "item": "Rotor",
@@ -726,16 +774,16 @@ const ITEMS = [
     "freqNum": 7854
   },
   {
+    "item": "Sílica",
+    "freq": "6548",
+    "image": "img/silica.png",
+    "freqNum": 6548
+  },
+  {
     "item": "Sinalizador",
     "freq": "9273",
     "image": "img/sinalizador-1.png",
     "freqNum": 9273
-  },
-  {
-    "item": "Sistema Diretor de Montagem",
-    "freq": "1745",
-    "image": "img/sistema-diretor-de-montagem.png",
-    "freqNum": 1745
   },
   {
     "item": "Sistema de Refrigeração",
@@ -744,22 +792,28 @@ const ITEMS = [
     "freqNum": 5837
   },
   {
+    "item": "Sistema Diretor de Montagem",
+    "freq": "1745",
+    "image": "img/sistema-diretor-de-montagem.png",
+    "freqNum": 1745
+  },
+  {
     "item": "Solução de Alumina",
     "freq": "4297",
     "image": "img/solucao-de-alumina.png",
     "freqNum": 4297
   },
   {
+    "item": "Solução de Sílica",
+    "freq": "6479",
+    "image": "img/solucao-de-silica.png",
+    "freqNum": 6479
+  },
+  {
     "item": "Supercomputador",
     "freq": "8247",
     "image": "img/supercomputador-1.png",
     "freqNum": 8247
-  },
-  {
-    "item": "Sílica",
-    "freq": "6548",
-    "image": "img/silica.png",
-    "freqNum": 6548
   },
   {
     "item": "Tanque de Fluidos Vazio",
@@ -778,6 +832,12 @@ const ITEMS = [
     "freq": "4798",
     "image": "img/tecido-1.png",
     "freqNum": 4798
+  },
+  {
+    "item": "Thoriuum",
+    "freq": "3822",
+    "image": "img/thorium-1.png",
+    "freqNum": 3822
   },
   {
     "item": "Trígono de Ficsita",
@@ -828,16 +888,22 @@ const ITEMS = [
     "freqNum": 1635
   },
   {
+    "item": "Vergalhão de Estilhaços",
+    "freq": "5483",
+    "image": "img/vergalhao-de-estilhacos.png",
+    "freqNum": 5483
+  },
+  {
     "item": "Vergalhão de Ferro",
     "freq": "1048",
     "image": "img/vergalhao-de-ferro.png",
     "freqNum": 1048
   },
   {
-    "item": "Viga Industrial Revestida",
-    "freq": "9317",
-    "image": "img/viga-industrial-revestida.png",
-    "freqNum": 9317
+    "item": "Vergalhão Explosivo",
+    "freq": "8396",
+    "image": "img/vergalhao-explosivo.png",
+    "freqNum": 8396
   },
   {
     "item": "Viga de Aço",
@@ -846,69 +912,9 @@ const ITEMS = [
     "freqNum": 6348
   },
   {
-    "item": "Ácido Nítrico",
-    "freq": "5832",
-    "image": "img/acido-nitrico.png",
-    "freqNum": 5832
-  },
-  {
-    "item": "Ácido Sulfúrico",
-    "freq": "7631",
-    "image": "img/acido-sulfurico.png",
-    "freqNum": 7631
-  },
-  {
-    "item": "Água",
-    "freq": "2473",
-    "image": "img/agua.png",
-    "freqNum": 2473
-  },
-  {
-    "item": "Munição Guiada de Fuzil",
-    "freq": "7314",
-    "image": "img/municao-guiada-de-fuzil.png",
-    "freqNum": 7314
-  },
-  {
-    "item": "Nobelisco",
-    "freq": "6847",
-    "image": "img/nobelisco-1.png",
-    "freqNum": 6847
-  },
-  {
-    "item": "Nobelisco de Fragmentação",
-    "freq": "4186",
-    "image": "img/nobelisco-de-fragmentacao.png",
-    "freqNum": 4186
-  },
-  {
-    "item": "Nobelisco de Pulso",
-    "freq": "7594",
-    "image": "img/nobelisco-de-pulso.png",
-    "freqNum": 7594
-  },
-  {
-    "item": "Nobelisco Venenoso",
-    "freq": "3968",
-    "image": "img/nobelisco-venenoso.png",
-    "freqNum": 3968
-  },
-  {
-    "item": "Solução de Sílica",
-    "freq": "6479",
-    "image": "img/solucao-de-silica.png",
-    "freqNum": 6479
-  },
-  {
-    "item": "Vergalhão de Estilhaços",
-    "freq": "5483",
-    "image": "img/vergalhao-de-estilhacos.png",
-    "freqNum": 5483
-  },
-  {
-    "item": "Vergalhão Explosivo",
-    "freq": "8396",
-    "image": "img/vergalhao-explosivo.png",
-    "freqNum": 8396
+    "item": "Viga Industrial Revestida",
+    "freq": "9317",
+    "image": "img/viga-industrial-revestida.png",
+    "freqNum": 9317
   }
 ];
