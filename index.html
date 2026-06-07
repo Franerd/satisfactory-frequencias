@@ -46,6 +46,61 @@
       <button id="clearFilters" class="ghost">Limpar filtros</button>
     </section>
 
+
+
+    <section class="adminPanel" id="adminPanel">
+      <div class="adminHead">
+        <div>
+          <p class="eyebrow">Admin</p>
+          <h2>Adicionar item pelo site</h2>
+          <p>Envia a imagem para a pasta <strong>img</strong> e atualiza o <strong>items.js</strong> direto no GitHub.</p>
+        </div>
+        <button id="toggleAdmin" class="ghost" type="button">Ocultar painel</button>
+      </div>
+
+      <div class="adminGrid">
+        <label>
+          <span>Dono do repositório</span>
+          <input id="ghOwner" type="text" placeholder="Ex.: franerd">
+        </label>
+        <label>
+          <span>Repositório</span>
+          <input id="ghRepo" type="text" placeholder="Ex.: frequencias-satisfactory">
+        </label>
+        <label>
+          <span>Branch</span>
+          <input id="ghBranch" type="text" value="main">
+        </label>
+        <label>
+          <span>Token GitHub</span>
+          <input id="ghToken" type="password" placeholder="Cole seu token aqui">
+        </label>
+      </div>
+
+      <div class="adminGrid itemForm">
+        <label>
+          <span>Nome do item</span>
+          <input id="newItemName" type="text" placeholder="Ex.: Placa de circuito">
+        </label>
+        <label>
+          <span>Frequência</span>
+          <input id="newItemFreq" type="number" placeholder="Ex.: 8265">
+        </label>
+        <label>
+          <span>Imagem PNG/JPG/WEBP</span>
+          <input id="newItemImage" type="file" accept="image/png,image/jpeg,image/webp">
+        </label>
+      </div>
+
+      <div class="adminActions">
+        <button id="saveGithubConfig" class="ghost" type="button">Salvar configuração</button>
+        <button id="addItemGithub" class="freqBtn adminSave" type="button">Enviar item para o GitHub</button>
+        <span id="adminStatus" class="adminStatus"></span>
+      </div>
+
+      <p class="adminWarning">Use um token com acesso apenas ao repositório desse site. Nunca coloque o token direto no código publicado.</p>
+    </section>
+
     <section id="grid" class="grid"></section>
   </main>
 
