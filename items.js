@@ -288,6 +288,12 @@ const ITEMS = [
     "freqNum": 9512
   },
   {
+    "item": "Disco Rígido",
+    "freq": "6612",
+    "image": "img/disco-rigido.png",
+    "freqNum": 6612
+  },
+  {
     "item": "Dissipador de Calor",
     "freq": "4932",
     "image": "img/dissipador-de-calor.png",
