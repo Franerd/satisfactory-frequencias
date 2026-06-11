@@ -478,11 +478,12 @@ function buildItemsJs(items){
   return `const ITEMS = ${JSON.stringify(items, null, 2)};\n`;
 }
 
-async function githubRequest(path, options = {}){
+async function githubApi(endpoint, options = {}){
   const owner = ghOwner.value.trim();
   const repo = ghRepo.value.trim();
   const token = ghToken.value.trim();
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  const cleanEndpoint = String(endpoint).replace(/^\/+/, '');
+  const url = `https://api.github.com/repos/${owner}/${repo}/${cleanEndpoint}`;
 
   const response = await fetch(url, {
     ...options,
@@ -499,6 +500,10 @@ async function githubRequest(path, options = {}){
     throw new Error(data.message || `Erro ${response.status} na API do GitHub.`);
   }
   return data;
+}
+
+async function githubRequest(path, options = {}){
+  return githubApi(`contents/${path}`, options);
 }
 
 async function putGithubFile(path, contentBase64, message, sha){
@@ -972,6 +977,14 @@ async function getExistingShaOrNull(path){
   }
 }
 
+async function createGithubBlob(content, encoding = 'base64'){
+  const blob = await githubApi('git/blobs', {
+    method: 'POST',
+    body: JSON.stringify({ content, encoding })
+  });
+  return blob.sha;
+}
+
 async function sendBatchQueueToGithub(){
   const owner = ghOwner.value.trim();
   const repo = ghRepo.value.trim();
@@ -987,36 +1000,106 @@ async function sendBatchQueueToGithub(){
   addItemGithub.disabled = true;
   saveConfig();
 
-  let ok = 0;
-  let failed = 0;
+  pending.forEach(entry => setQueueItemStatus(entry.id, 'sending', 'Preparando envio em lote...'));
+  setAdminStatus(`Preparando ${pending.length} item(ns) para um único commit...`, 'loading');
 
-  for(const entry of pending){
-    setQueueItemStatus(entry.id, 'sending', 'Enviando para o GitHub...');
-    setAdminStatus(`Enviando fila: ${ok + failed + 1}/${pending.length} - ${entry.itemName}`, 'loading');
+  try{
+    // Lê o items.js mais recente do GitHub uma única vez.
+    const itemsFile = await getGithubFile('items.js');
+    const itemsJs = decodeBase64Utf8(itemsFile.content);
+    const items = extractItemsFromJs(itemsJs);
 
-    try{
-      await sendOneQueuedItem(entry);
-      ok++;
-      setQueueItemStatus(entry.id, 'done', 'Enviado com sucesso.');
-    } catch(err){
-      failed++;
-      setQueueItemStatus(entry.id, 'error', err.message);
+    const plannedItems = [...items];
+    const treeEntries = [];
+
+    for(const entry of pending){
+      if(entry.sourceKey) learnNameCorrection(entry.sourceKey, entry.itemName);
+
+      const freqError = validateFrequency(entry.freq, plannedItems, entry.itemName);
+      if(freqError) throw new Error(`${entry.itemName}: ${freqError}`);
+
+      const newItem = {
+        item: entry.itemName,
+        freq: String(entry.freq),
+        image: entry.imagePath,
+        freqNum: Number(entry.freq)
+      };
+
+      const existingIndex = plannedItems.findIndex(i => normalizeText(i.item) === normalizeText(entry.itemName));
+      if(existingIndex >= 0){
+        plannedItems[existingIndex] = newItem;
+      } else {
+        plannedItems.push(newItem);
+      }
+
+      setAdminStatus(`Enviando imagem para o commit: ${entry.itemName}`, 'loading');
+      const imageBlobSha = await createGithubBlob(entry.imageContent, 'base64');
+      treeEntries.push({
+        path: entry.imagePath.replace(/^\/+/, ''),
+        mode: '100644',
+        type: 'blob',
+        sha: imageBlobSha
+      });
     }
+
+    plannedItems.sort((a,b) => a.item.localeCompare(b.item, 'pt-BR'));
+
+    setAdminStatus('Preparando items.js atualizado...', 'loading');
+    const itemsBlobSha = await createGithubBlob(encodeBase64Utf8(buildItemsJs(plannedItems)), 'base64');
+    treeEntries.push({
+      path: 'items.js',
+      mode: '100644',
+      type: 'blob',
+      sha: itemsBlobSha
+    });
+
+    setAdminStatus('Criando commit único no GitHub...', 'loading');
+    const ref = await githubApi(`git/ref/heads/${encodeURIComponent(branch)}`);
+    const baseCommit = await githubApi(`git/commits/${ref.object.sha}`);
+
+    const newTree = await githubApi('git/trees', {
+      method: 'POST',
+      body: JSON.stringify({
+        base_tree: baseCommit.tree.sha,
+        tree: treeEntries
+      })
+    });
+
+    const commitMessage = pending.length === 1
+      ? `Adiciona item: ${pending[0].itemName}`
+      : `Adiciona ${pending.length} itens em lote`;
+
+    const newCommit = await githubApi('git/commits', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: commitMessage,
+        tree: newTree.sha,
+        parents: [ref.object.sha]
+      })
+    });
+
+    await githubApi(`git/refs/heads/${encodeURIComponent(branch)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        sha: newCommit.sha,
+        force: false
+      })
+    });
+
+    pending.forEach(entry => setQueueItemStatus(entry.id, 'done', 'Enviado no commit em lote.'));
+    batchQueue = batchQueue.filter(item => item.status !== 'done');
+    saveBatchQueue();
+    renderBatchQueue();
+
+    setAdminStatus(`Fila enviada com sucesso em 1 commit: ${pending.length} item(ns). O GitHub Pages pode levar alguns minutos para atualizar.`, 'ok');
+  } catch(err){
+    pending.forEach(entry => setQueueItemStatus(entry.id, 'error', err.message));
+    setAdminStatus(`Erro no envio em lote: ${err.message}`, 'error');
+  } finally {
+    sendBatchQueue.disabled = false;
+    addItemToQueue.disabled = false;
+    addItemGithub.disabled = false;
   }
-
-  batchQueue = batchQueue.filter(item => item.status !== 'done');
-  saveBatchQueue();
-  renderBatchQueue();
-
-  if(failed){
-    setAdminStatus(`Fila finalizada com ${ok} enviado(s) e ${failed} erro(s). Corrija os itens com erro e tente novamente.`, 'error');
-  } else {
-    setAdminStatus(`Fila enviada com sucesso: ${ok} item(ns). O GitHub Pages pode levar alguns minutos para atualizar.`, 'ok');
-  }
-
-  sendBatchQueue.disabled = false;
-  addItemToQueue.disabled = false;
-  addItemGithub.disabled = false;
 }
 
 function clearQueue(){
