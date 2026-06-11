@@ -12,10 +12,22 @@ const ITEMS = [
     "freqNum": 7631
   },
   {
+    "item": "Agário-de-bacon",
+    "freq": "5157",
+    "image": "img/agario-de-bacon.png",
+    "freqNum": 5157
+  },
+  {
     "item": "Água",
     "freq": "2473",
     "image": "img/agua.png",
     "freqNum": 2473
+  },
+  {
+    "item": "Arma de vergalhão",
+    "freq": "5316",
+    "image": "img/arma-de-vergalhao.png",
+    "freqNum": 5316
   },
   {
     "item": "Armação Modular",
@@ -34,6 +46,12 @@ const ITEMS = [
     "freq": "8741",
     "image": "img/armacao-modular-reforcada.png",
     "freqNum": 8741
+  },
+  {
+    "item": "Baga-pálida",
+    "freq": "6003",
+    "image": "img/baga-palida.png",
+    "freqNum": 6003
   },
   {
     "item": "Barra de Combustível de Ficsônio",
@@ -126,6 +144,12 @@ const ITEMS = [
     "freqNum": 2563
   },
   {
+    "item": "Caneca de Café FICSIT™",
+    "freq": "2723",
+    "image": "img/caneca-de-cafe-ficsit.png",
+    "freqNum": 2723
+  },
+  {
     "item": "Cápsula de DNA Alienígena",
     "freq": "9475",
     "image": "img/capsula-de-dna-alienigena.png",
@@ -136,6 +160,18 @@ const ITEMS = [
     "freq": "1427 / 333",
     "image": "img/carcaca-de-aluminio.png",
     "freqNum": 0
+  },
+  {
+    "item": "Carrinho de Fábrica™",
+    "freq": "1546",
+    "image": "img/carrinho-de-fabrica.png",
+    "freqNum": 1546
+  },
+  {
+    "item": "Carrinho Dourado de Fábrica™",
+    "freq": "3114",
+    "image": "img/carrinho-dourado-de-fabrica.png",
+    "freqNum": 3114
   },
   {
     "item": "Cartucho de Cor",
@@ -252,6 +288,12 @@ const ITEMS = [
     "freqNum": 3927
   },
   {
+    "item": "Copo de Café FICSIT™ Dourado",
+    "freq": "2026",
+    "image": "img/copo-de-cafe-ficsit-dourado.png",
+    "freqNum": 2026
+  },
+  {
     "item": "Coque de Petróleo",
     "freq": "8271",
     "image": "img/coque-de-petroleo.png",
@@ -288,6 +330,12 @@ const ITEMS = [
     "freqNum": 5064
   },
   {
+    "item": "Detonador de Nobelisco",
+    "freq": "9913",
+    "image": "img/detonador-de-nobelisco.png",
+    "freqNum": 9913
+  },
+  {
     "item": "Diamantes",
     "freq": "9512",
     "image": "img/diamantes-1.png",
@@ -312,16 +360,40 @@ const ITEMS = [
     "freqNum": 9835
   },
   {
+    "item": "Eletrocutalien",
+    "freq": "5779",
+    "image": "img/eletrocutalien.png",
+    "freqNum": 5779
+  },
+  {
     "item": "Enxofre",
     "freq": "5726",
     "image": "img/enxofre-1.png",
     "freqNum": 5726
   },
   {
+    "item": "Escâner de objetos",
+    "freq": "7759",
+    "image": "img/escaner-de-objetos.png",
+    "freqNum": 7759
+  },
+  {
     "item": "Escultor Bioquímico",
     "freq": "8751",
     "image": "img/escultor-bioquimico.png",
     "freqNum": 8751
+  },
+  {
+    "item": "Esfera de Mercer",
+    "freq": "7706",
+    "image": "img/esfera-de-mercer.png",
+    "freqNum": 7706
+  },
+  {
+    "item": "Esmagalien",
+    "freq": "2650",
+    "image": "img/esmagalien.png",
+    "freqNum": 2650
   },
   {
     "item": "Estator",
@@ -340,6 +412,12 @@ const ITEMS = [
     "freq": "9147",
     "image": "img/estrutura-versatil.png",
     "freqNum": 9147
+  },
+  {
+    "item": "Exoesqueleto de corrida",
+    "freq": "3325",
+    "image": "img/exoesqueleto-de-corrida.png",
+    "freqNum": 3325
   },
   {
     "item": "Fiação Automatizada",
@@ -400,6 +478,12 @@ const ITEMS = [
     "freq": "1438",
     "image": "img/fragmentos-de-aluminio.png",
     "freqNum": 1438
+  },
+  {
+    "item": "Fuzil",
+    "freq": "7914",
+    "image": "img/fuzil.png",
+    "freqNum": 7914
   },
   {
     "item": "Galão de Ácido Nítrico",
@@ -466,6 +550,18 @@ const ITEMS = [
     "freq": "4981",
     "image": "img/gerador-de-campo-magnetico.png",
     "freqNum": 4981
+  },
+  {
+    "item": "Helipropulsor",
+    "freq": "3465",
+    "image": "img/helipropulsor.png",
+    "freqNum": 3465
+  },
+  {
+    "item": "Inalador medicinal",
+    "freq": "3013",
+    "image": "img/inalador-medicinal.png",
+    "freqNum": 3013
   },
   {
     "item": "Laço de Somer",
@@ -594,6 +690,12 @@ const ITEMS = [
     "freqNum": 3971
   },
   {
+    "item": "Mineradora portátil",
+    "freq": "5386",
+    "image": "img/mineradora-portatil.png",
+    "freqNum": 5386
+  },
+  {
     "item": "Minério de Catério",
     "freq": "4986",
     "image": "img/minerio-de-caterio.png",
@@ -690,6 +792,12 @@ const ITEMS = [
     "freqNum": 3968
   },
   {
+    "item": "Noz-berilo",
+    "freq": "8664",
+    "image": "img/noz-berilo.png",
+    "freqNum": 8664
+  },
+  {
     "item": "Oscilador de Cristal",
     "freq": "9072",
     "image": "img/oscilador-de-cristal.png",
@@ -706,6 +814,12 @@ const ITEMS = [
     "freq": "1278",
     "image": "img/parafuso-1.png",
     "freqNum": 1278
+  },
+  {
+    "item": "Paraquedas",
+    "freq": "4742",
+    "image": "img/paraquedas.png",
+    "freqNum": 4742
   },
   {
     "item": "Pastilha de Plutônio",
@@ -768,6 +882,12 @@ const ITEMS = [
     "freqNum": 9124
   },
   {
+    "item": "Propulsor a jato",
+    "freq": "8578",
+    "image": "img/propulsor-a-jato.png",
+    "freqNum": 8578
+  },
+  {
     "item": "Proteína Alienígena",
     "freq": "3628",
     "image": "img/proteina-alienigena.png",
@@ -808,6 +928,24 @@ const ITEMS = [
     "freq": "7037",
     "image": "img/restos-de-cuspidor.png",
     "freqNum": 7037
+  },
+  {
+    "item": "Restos de Incubador",
+    "freq": "7971",
+    "image": "img/restos-de-incubador.png",
+    "freqNum": 7971
+  },
+  {
+    "item": "Restos de Javali",
+    "freq": "8841",
+    "image": "img/restos-de-javali.png",
+    "freqNum": 8841
+  },
+  {
+    "item": "Restos de Picador",
+    "freq": "9008",
+    "image": "img/restos-de-picador.png",
+    "freqNum": 9008
   },
   {
     "item": "Rotor",
@@ -886,6 +1024,18 @@ const ITEMS = [
     "freq": "3822",
     "image": "img/thorium-1.png",
     "freqNum": 3822
+  },
+  {
+    "item": "Tirolesa",
+    "freq": "3566",
+    "image": "img/tirolesa.png",
+    "freqNum": 3566
+  },
+  {
+    "item": "Traje antirradiação",
+    "freq": "8523",
+    "image": "img/traje-antirradiacao.png",
+    "freqNum": 8523
   },
   {
     "item": "Trígono de Ficsita",
