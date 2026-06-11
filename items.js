@@ -102,6 +102,12 @@ const ITEMS = [
     "freqNum": 1235
   },
   {
+    "item": "Boombox",
+    "freq": "5653",
+    "image": "img/boombox.png",
+    "freqNum": 5653
+  },
+  {
     "item": "Borracha",
     "freq": "3726",
     "image": "img/borracha-1.png",
