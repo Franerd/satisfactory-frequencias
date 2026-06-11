@@ -111,6 +111,8 @@ const addItemToQueue = document.querySelector('#addItemToQueue');
 const sendBatchQueue = document.querySelector('#sendBatchQueue');
 const clearBatchQueue = document.querySelector('#clearBatchQueue');
 const batchQueueList = document.querySelector('#batchQueueList');
+const bulkImageInput = document.querySelector('#bulkImageInput');
+const addBulkImagesToQueue = document.querySelector('#addBulkImagesToQueue');
 const adminStatus = document.querySelector('#adminStatus');
 const adminPanel = document.querySelector('#adminPanel');
 const adminAccess = document.querySelector('#adminAccess');
@@ -293,6 +295,36 @@ function slugifyFileName(text){
   return normalizeText(text)
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'item';
+}
+
+function titleCasePt(text){
+  const smallWords = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'no', 'na', 'nos', 'nas', 'para', 'com']);
+  return String(text)
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+    .map((word, index) => {
+      const lower = word.toLocaleLowerCase('pt-BR');
+      if(index > 0 && smallWords.has(lower)) return lower;
+      return lower.charAt(0).toLocaleUpperCase('pt-BR') + lower.slice(1);
+    })
+    .join(' ');
+}
+
+function inferItemNameFromFileName(fileName){
+  const baseName = String(fileName)
+    .replace(/\.[^.]+$/, '')
+    .replace(/\s*\([0-9]+\)\s*$/, '')
+    .replace(/[-_\s]+[0-9]+$/, '')
+    .trim();
+
+  const slug = slugifyFileName(baseName);
+  const existing = ITEMS.find(item => slugifyFileName(item.item) === slug || slugifyFileName(item.image || '').endsWith(`/${slug}`));
+  if(existing) return existing.item;
+
+  return titleCasePt(baseName);
 }
 
 function getImageExtension(file){
@@ -603,6 +635,101 @@ async function addCurrentItemToQueue(){
   }
 }
 
+
+async function addSelectedImagesToQueue(){
+  const files = Array.from(bulkImageInput?.files || []);
+  if(!files.length) return setAdminStatus('Selecione uma ou mais imagens para adicionar à fila.', 'error');
+
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+  let added = 0;
+  let skipped = 0;
+  const errors = [];
+  const plannedItems = [];
+
+  for(const file of files){
+    try{
+      if(file.type && !allowedTypes.includes(file.type)){
+        skipped++;
+        errors.push(`${file.name}: formato inválido.`);
+        continue;
+      }
+
+      const itemName = inferItemNameFromFileName(file.name);
+      if(!itemName){
+        skipped++;
+        errors.push(`${file.name}: não consegui definir o nome do item.`);
+        continue;
+      }
+
+      const alreadyExists = ITEMS.find(item => normalizeText(item.item) === normalizeText(itemName));
+      const alreadyQueued = batchQueue.find(item => normalizeText(item.itemName) === normalizeText(itemName) && item.status !== 'done');
+      const alreadyPlanned = plannedItems.find(item => normalizeText(item.item) === normalizeText(itemName));
+
+      if(alreadyExists || alreadyQueued || alreadyPlanned){
+        skipped++;
+        errors.push(`${file.name}: o item "${itemName}" já existe ou já está na fila.`);
+        continue;
+      }
+
+      const ext = getImageExtension(file);
+      const imagePath = `img/${slugifyFileName(itemName)}.${ext}`;
+      const imagePathCollision = ITEMS.find(item => item.image === imagePath && normalizeText(item.item) !== normalizeText(itemName));
+      if(imagePathCollision){
+        skipped++;
+        errors.push(`${file.name}: o caminho ${imagePath} já é usado por "${imagePathCollision.item}".`);
+        continue;
+      }
+
+      const validationItems = [...ITEMS, ...queueAsItems(), ...plannedItems];
+      const freq = gerarFrequenciaUnica(validationItems);
+      const freqError = validateFrequency(freq, validationItems, itemName);
+      if(freqError){
+        skipped++;
+        errors.push(`${file.name}: ${freqError}`);
+        continue;
+      }
+
+      const imageContent = await fileToBase64(file);
+      const entry = {
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        itemName,
+        freq: String(freq),
+        freqNum: Number(freq),
+        ext,
+        fileName: file.name,
+        fileType: file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+        imagePath,
+        imageContent,
+        status: 'pending',
+        message: 'Adicionado automaticamente pelo nome da imagem.'
+      };
+
+      batchQueue.push(entry);
+      plannedItems.push({
+        item: itemName,
+        freq: String(freq),
+        freqNum: Number(freq),
+        image: imagePath
+      });
+      added++;
+    } catch(err){
+      skipped++;
+      errors.push(`${file.name}: ${err.message}`);
+    }
+  }
+
+  saveBatchQueue();
+  renderBatchQueue();
+  if(bulkImageInput) bulkImageInput.value = '';
+  preencherFrequenciaUnica([...ITEMS, ...queueAsItems()]);
+
+  if(errors.length){
+    setAdminStatus(`Adicionadas ${added} imagem(ns) à fila. Ignoradas ${skipped}: ${errors.slice(0, 3).join(' | ')}${errors.length > 3 ? '...' : ''}`, added ? 'ok' : 'error');
+  } else {
+    setAdminStatus(`${added} imagem(ns) adicionada(s) à fila automaticamente. Revise antes de enviar ao GitHub.`, 'ok');
+  }
+}
+
 async function sendOneQueuedItem(entry){
   const imageSha = await getExistingShaOrNull(entry.imagePath);
 
@@ -805,6 +932,7 @@ addItemGithub?.addEventListener('click', addItemToGithub);
 addItemToQueue?.addEventListener('click', addCurrentItemToQueue);
 sendBatchQueue?.addEventListener('click', sendBatchQueueToGithub);
 clearBatchQueue?.addEventListener('click', clearQueue);
+addBulkImagesToQueue?.addEventListener('click', addSelectedImagesToQueue);
 openAdminLogin?.addEventListener('click', () => {
   adminLoginBox.classList.toggle('hidden');
   if(!adminLoginBox.classList.contains('hidden')) adminPassword.focus();

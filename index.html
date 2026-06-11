@@ -113,6 +113,25 @@
         <span id="adminStatus" class="adminStatus"></span>
       </div>
 
+      <section class="autoBatchPanel" id="autoBatchPanel">
+        <div class="batchHead">
+          <div>
+            <h3>Adicionar várias imagens automaticamente</h3>
+            <p>Selecione várias imagens. O nome do item será criado pelo nome do arquivo e a frequência será gerada automaticamente.</p>
+          </div>
+        </div>
+
+        <div class="autoBatchGrid">
+          <label>
+            <span>Imagens dos itens</span>
+            <input id="bulkImageInput" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+          </label>
+          <button id="addBulkImagesToQueue" class="freqBtn adminSave" type="button">Adicionar imagens à fila</button>
+        </div>
+
+        <p class="adminWarning">Dica: nomeie os arquivos com o nome do item, por exemplo <strong>Placa de circuito.png</strong> ou <strong>placa-de-circuito.png</strong>. Antes de enviar ao GitHub, revise a fila.</p>
+      </section>
+
       <section class="batchPanel" id="batchPanel">
         <div class="batchHead">
           <div>
