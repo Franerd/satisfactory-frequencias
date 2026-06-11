@@ -107,6 +107,10 @@ const newItemImage = document.querySelector('#newItemImage');
 const generateFreq = document.querySelector('#generateFreq');
 const saveGithubConfig = document.querySelector('#saveGithubConfig');
 const addItemGithub = document.querySelector('#addItemGithub');
+const addItemToQueue = document.querySelector('#addItemToQueue');
+const sendBatchQueue = document.querySelector('#sendBatchQueue');
+const clearBatchQueue = document.querySelector('#clearBatchQueue');
+const batchQueueList = document.querySelector('#batchQueueList');
 const adminStatus = document.querySelector('#adminStatus');
 const adminPanel = document.querySelector('#adminPanel');
 const adminAccess = document.querySelector('#adminAccess');
@@ -461,6 +465,251 @@ async function replaceExistingImageOnGithub(){
 }
 
 
+const BATCH_QUEUE_KEY = 'satisfactoryBatchQueue';
+let batchQueue = loadBatchQueue();
+
+function loadBatchQueue(){
+  try{
+    const parsed = JSON.parse(localStorage.getItem(BATCH_QUEUE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveBatchQueue(){
+  localStorage.setItem(BATCH_QUEUE_KEY, JSON.stringify(batchQueue));
+}
+
+function queueAsItems(excludeId = ''){
+  return batchQueue
+    .filter(item => item.id !== excludeId && item.status !== 'done')
+    .map(item => ({
+      item: item.itemName,
+      freq: String(item.freq),
+      freqNum: Number(item.freq),
+      image: item.imagePath || `img/${slugifyFileName(item.itemName)}.${item.ext || 'png'}`
+    }));
+}
+
+function setQueueItemStatus(id, status, message = ''){
+  const item = batchQueue.find(entry => entry.id === id);
+  if(!item) return;
+  item.status = status;
+  item.message = message;
+  saveBatchQueue();
+  renderBatchQueue();
+}
+
+function renderBatchQueue(){
+  if(!batchQueueList) return;
+
+  if(!batchQueue.length){
+    batchQueueList.innerHTML = '<p class="emptyQueue">Nenhum item na fila.</p>';
+    return;
+  }
+
+  batchQueueList.innerHTML = '';
+  batchQueue.forEach((entry, index) => {
+    const row = document.createElement('div');
+    row.className = `batchQueueItem ${entry.status || 'pending'}`;
+
+    const preview = document.createElement('img');
+    preview.src = `data:${entry.fileType};base64,${entry.imageContent}`;
+    preview.alt = entry.itemName;
+
+    const info = document.createElement('div');
+    info.className = 'batchQueueInfo';
+    info.innerHTML = `
+      <strong>${index + 1}. ${entry.itemName}</strong>
+      <span>Frequência: ${entry.freq}</span>
+      <small>${entry.imagePath || `img/${slugifyFileName(entry.itemName)}.${entry.ext}`}</small>
+      ${entry.message ? `<em>${entry.message}</em>` : ''}
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'batchQueueActions';
+
+    const status = document.createElement('span');
+    status.className = `queueStatus ${entry.status || 'pending'}`;
+    status.textContent = entry.status === 'done' ? 'Enviado' : entry.status === 'error' ? 'Erro' : entry.status === 'sending' ? 'Enviando' : 'Na fila';
+
+    const remove = document.createElement('button');
+    remove.className = 'ghost';
+    remove.type = 'button';
+    remove.textContent = 'Remover';
+    remove.disabled = entry.status === 'sending';
+    remove.addEventListener('click', () => {
+      batchQueue = batchQueue.filter(item => item.id !== entry.id);
+      saveBatchQueue();
+      renderBatchQueue();
+    });
+
+    actions.append(status, remove);
+    row.append(preview, info, actions);
+    batchQueueList.appendChild(row);
+  });
+}
+
+async function addCurrentItemToQueue(){
+  const itemName = newItemName.value.trim();
+  const freq = newItemFreq.value.trim();
+  const file = newItemImage.files[0];
+
+  if(!itemName || !freq) return setAdminStatus('Preencha nome do item e frequência antes de adicionar à fila.', 'error');
+  if(!file) return setAdminStatus('Selecione uma imagem antes de adicionar à fila.', 'error');
+
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+  if(file.type && !allowedTypes.includes(file.type)){
+    return setAdminStatus('Use uma imagem PNG, JPG ou WEBP.', 'error');
+  }
+
+  const validationItems = [...ITEMS, ...queueAsItems()];
+  const freqError = validateFrequency(freq, validationItems, itemName);
+  if(freqError) return setAdminStatus(freqError, 'error');
+
+  const repeatedNameInQueue = batchQueue.find(item => normalizeText(item.itemName) === normalizeText(itemName) && item.status !== 'done');
+  if(repeatedNameInQueue) return setAdminStatus(`O item "${itemName}" já está na fila. Remova ele antes de adicionar novamente.`, 'error');
+
+  try{
+    const ext = getImageExtension(file);
+    const imagePath = `img/${slugifyFileName(itemName)}.${ext}`;
+    const imageContent = await fileToBase64(file);
+
+    batchQueue.push({
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      itemName,
+      freq: String(freq),
+      freqNum: Number(freq),
+      ext,
+      fileName: file.name,
+      fileType: file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+      imagePath,
+      imageContent,
+      status: 'pending',
+      message: ''
+    });
+
+    saveBatchQueue();
+    renderBatchQueue();
+    setAdminStatus(`Item "${itemName}" adicionado à fila.`, 'ok');
+
+    newItemName.value = '';
+    newItemFreq.value = '';
+    newItemImage.value = '';
+    preencherFrequenciaUnica([...ITEMS, ...queueAsItems()]);
+  } catch(err){
+    setAdminStatus(`Erro ao adicionar à fila: ${err.message}`, 'error');
+  }
+}
+
+async function sendOneQueuedItem(entry){
+  const imageSha = await getExistingShaOrNull(entry.imagePath);
+
+  await putGithubFile(
+    entry.imagePath,
+    entry.imageContent,
+    `Adiciona imagem: ${entry.itemName}`,
+    imageSha
+  );
+
+  const itemsFile = await getGithubFile('items.js');
+  const itemsJs = decodeBase64Utf8(itemsFile.content);
+  const items = extractItemsFromJs(itemsJs);
+  const remoteFreqError = validateFrequency(entry.freq, items, entry.itemName);
+  if(remoteFreqError) throw new Error(remoteFreqError);
+
+  const newItem = {
+    item: entry.itemName,
+    freq: String(entry.freq),
+    image: entry.imagePath,
+    freqNum: Number(entry.freq)
+  };
+
+  const existingIndex = items.findIndex(i => normalizeText(i.item) === normalizeText(entry.itemName));
+  if(existingIndex >= 0){
+    items[existingIndex] = newItem;
+  } else {
+    items.push(newItem);
+  }
+
+  items.sort((a,b) => a.item.localeCompare(b.item, 'pt-BR'));
+
+  await putGithubFile(
+    'items.js',
+    encodeBase64Utf8(buildItemsJs(items)),
+    existingIndex >= 0 ? `Atualiza item: ${entry.itemName}` : `Adiciona item: ${entry.itemName}`,
+    itemsFile.sha
+  );
+}
+
+async function getExistingShaOrNull(path){
+  try{
+    const existing = await getGithubFile(path);
+    return existing.sha;
+  } catch(err){
+    if(String(err.message).includes('Not Found')) return null;
+    throw err;
+  }
+}
+
+async function sendBatchQueueToGithub(){
+  const owner = ghOwner.value.trim();
+  const repo = ghRepo.value.trim();
+  const token = ghToken.value.trim();
+  const branch = ghBranch.value.trim() || 'main';
+
+  if(!owner || !repo || !token || !branch) return setAdminStatus('Preencha dono, repositório, branch e token.', 'error');
+  const pending = batchQueue.filter(item => item.status !== 'done');
+  if(!pending.length) return setAdminStatus('A fila não possui itens pendentes.', 'error');
+
+  sendBatchQueue.disabled = true;
+  addItemToQueue.disabled = true;
+  addItemGithub.disabled = true;
+  saveConfig();
+
+  let ok = 0;
+  let failed = 0;
+
+  for(const entry of pending){
+    setQueueItemStatus(entry.id, 'sending', 'Enviando para o GitHub...');
+    setAdminStatus(`Enviando fila: ${ok + failed + 1}/${pending.length} - ${entry.itemName}`, 'loading');
+
+    try{
+      await sendOneQueuedItem(entry);
+      ok++;
+      setQueueItemStatus(entry.id, 'done', 'Enviado com sucesso.');
+    } catch(err){
+      failed++;
+      setQueueItemStatus(entry.id, 'error', err.message);
+    }
+  }
+
+  batchQueue = batchQueue.filter(item => item.status !== 'done');
+  saveBatchQueue();
+  renderBatchQueue();
+
+  if(failed){
+    setAdminStatus(`Fila finalizada com ${ok} enviado(s) e ${failed} erro(s). Corrija os itens com erro e tente novamente.`, 'error');
+  } else {
+    setAdminStatus(`Fila enviada com sucesso: ${ok} item(ns). O GitHub Pages pode levar alguns minutos para atualizar.`, 'ok');
+  }
+
+  sendBatchQueue.disabled = false;
+  addItemToQueue.disabled = false;
+  addItemGithub.disabled = false;
+}
+
+function clearQueue(){
+  if(!batchQueue.length) return setAdminStatus('A fila já está vazia.', 'ok');
+  if(!confirm('Tem certeza que deseja limpar toda a fila?')) return;
+  batchQueue = [];
+  saveBatchQueue();
+  renderBatchQueue();
+  setAdminStatus('Fila limpa.', 'ok');
+}
+
+
 async function addItemToGithub(){
   const owner = ghOwner.value.trim();
   const repo = ghRepo.value.trim();
@@ -553,6 +802,9 @@ newItemFreq?.addEventListener('input', () => {
   if(error) setAdminStatus(error, 'error');
 });
 addItemGithub?.addEventListener('click', addItemToGithub);
+addItemToQueue?.addEventListener('click', addCurrentItemToQueue);
+sendBatchQueue?.addEventListener('click', sendBatchQueueToGithub);
+clearBatchQueue?.addEventListener('click', clearQueue);
 openAdminLogin?.addEventListener('click', () => {
   adminLoginBox.classList.toggle('hidden');
   if(!adminLoginBox.classList.contains('hidden')) adminPassword.focus();
@@ -569,6 +821,7 @@ imageUpdateModal?.addEventListener('click', (event) => {
   if(event.target === imageUpdateModal) closeImageModal();
 });
 
+renderBatchQueue();
 loadGithubConfig();
 suggestInitialFrequency();
 initAdminLogin();

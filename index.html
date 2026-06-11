@@ -108,9 +108,29 @@
 
       <div class="adminActions">
         <button id="saveGithubConfig" class="ghost" type="button">Salvar configuração</button>
+        <button id="addItemToQueue" class="ghost" type="button">Adicionar à fila</button>
         <button id="addItemGithub" class="freqBtn adminSave" type="button">Enviar item para o GitHub</button>
         <span id="adminStatus" class="adminStatus"></span>
       </div>
+
+      <section class="batchPanel" id="batchPanel">
+        <div class="batchHead">
+          <div>
+            <h3>Fila de cadastro em lote</h3>
+            <p>Adicione vários itens à fila, revise tudo e envie em sequência para o GitHub.</p>
+          </div>
+          <div class="batchActions">
+            <button id="sendBatchQueue" class="freqBtn adminSave" type="button">Enviar fila para o GitHub</button>
+            <button id="clearBatchQueue" class="ghost" type="button">Limpar fila</button>
+          </div>
+        </div>
+
+        <div id="batchQueueList" class="batchQueueList">
+          <p class="emptyQueue">Nenhum item na fila.</p>
+        </div>
+
+        <p class="adminWarning">A fila fica salva neste navegador. Para cada item, o sistema envia a imagem e atualiza o items.js em sequência.</p>
+      </section>
 
       <p class="adminWarning">Use um token com acesso apenas ao repositório desse site. Nunca coloque o token direto no código publicado.</p>
     </section>
