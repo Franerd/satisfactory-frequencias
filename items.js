@@ -618,6 +618,12 @@ const ITEMS = [
     "freqNum": 8147
   },
   {
+    "item": "Motosserra",
+    "freq": "4124",
+    "image": "img/motosserra.png",
+    "freqNum": 4124
+  },
+  {
     "item": "Munição de Fuzil",
     "freq": "2784",
     "image": "img/municao-de-fuzil.png",
