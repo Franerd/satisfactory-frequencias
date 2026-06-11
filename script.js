@@ -113,6 +113,9 @@ const clearBatchQueue = document.querySelector('#clearBatchQueue');
 const batchQueueList = document.querySelector('#batchQueueList');
 const bulkImageInput = document.querySelector('#bulkImageInput');
 const addBulkImagesToQueue = document.querySelector('#addBulkImagesToQueue');
+const customDictionaryBox = document.querySelector('#customDictionaryBox');
+const saveCustomDictionary = document.querySelector('#saveCustomDictionary');
+const clearCustomDictionary = document.querySelector('#clearCustomDictionary');
 const adminStatus = document.querySelector('#adminStatus');
 const adminPanel = document.querySelector('#adminPanel');
 const adminAccess = document.querySelector('#adminAccess');
@@ -313,18 +316,125 @@ function titleCasePt(text){
     .join(' ');
 }
 
-function inferItemNameFromFileName(fileName){
-  const baseName = String(fileName)
+const CUSTOM_NAME_DICTIONARY_KEY = 'satisfactoryCustomNameDictionary';
+const DEFAULT_ITEM_NAME_TRANSLATIONS = {
+  HardDrive: 'Disco Rígido',
+  Boombox: 'Boombox',
+  PowerShard: 'Fragmento de Energia',
+  MercerSphere: 'Esfera Mercer',
+  Somersloop: 'Somersloop',
+  AlienPowerMatrix: 'Matriz de Energia Alienígena'
+};
+
+function loadCustomNameDictionary(){
+  try{
+    const parsed = JSON.parse(localStorage.getItem(CUSTOM_NAME_DICTIONARY_KEY) || '{}');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveCustomNameDictionary(dict){
+  localStorage.setItem(CUSTOM_NAME_DICTIONARY_KEY, JSON.stringify(dict, null, 2));
+  renderCustomDictionaryBox();
+}
+
+function getNameDictionary(){
+  return { ...DEFAULT_ITEM_NAME_TRANSLATIONS, ...loadCustomNameDictionary() };
+}
+
+function cleanFileNameKey(fileName){
+  return String(fileName)
     .replace(/\.[^.]+$/, '')
     .replace(/\s*\([0-9]+\)\s*$/, '')
-    .replace(/[-_\s]+[0-9]+$/, '')
+    .replace(/^(IconDesc|Icon|Desc|Item|ItemDesc)[-_\s]*/i, '')
+    .replace(/[-_\s]+(32|64|128|256|512|1024|2048)$/i, '')
+    .replace(/[-_\s]+$/g, '')
     .trim();
+}
 
-  const slug = slugifyFileName(baseName);
-  const existing = ITEMS.find(item => slugifyFileName(item.item) === slug || slugifyFileName(item.image || '').endsWith(`/${slug}`));
-  if(existing) return existing.item;
+function normalizeDictionaryKey(key){
+  return String(key)
+    .replace(/[^a-zA-Z0-9]+/g, '')
+    .trim();
+}
 
-  return titleCasePt(baseName);
+function humanizeCleanKey(key){
+  return titleCasePt(
+    String(key)
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+      .replace(/[_-]+/g, ' ')
+  );
+}
+
+function inferItemDataFromFileName(fileName){
+  const cleanKey = cleanFileNameKey(fileName);
+  const normalizedKey = normalizeDictionaryKey(cleanKey);
+  const dictionary = getNameDictionary();
+
+  const dictionaryMatch = dictionary[cleanKey] || dictionary[normalizedKey];
+  if(dictionaryMatch){
+    return { itemName: dictionaryMatch, sourceKey: normalizedKey || cleanKey, learned: true };
+  }
+
+  const slug = slugifyFileName(humanizeCleanKey(cleanKey));
+  const existing = ITEMS.find(item =>
+    slugifyFileName(item.item) === slug ||
+    slugifyFileName((item.image || '').replace(/^img\//, '').replace(/\.[^.]+$/, '')) === slug
+  );
+  if(existing){
+    return { itemName: existing.item, sourceKey: normalizedKey || cleanKey, learned: true };
+  }
+
+  return { itemName: humanizeCleanKey(cleanKey), sourceKey: normalizedKey || cleanKey, learned: false };
+}
+
+function inferItemNameFromFileName(fileName){
+  return inferItemDataFromFileName(fileName).itemName;
+}
+
+function learnNameCorrection(sourceKey, itemName){
+  const key = normalizeDictionaryKey(sourceKey);
+  const value = String(itemName || '').trim();
+  if(!key || !value) return;
+
+  const defaults = DEFAULT_ITEM_NAME_TRANSLATIONS;
+  if(defaults[key] === value) return;
+
+  const dict = loadCustomNameDictionary();
+  if(dict[key] !== value){
+    dict[key] = value;
+    saveCustomNameDictionary(dict);
+  }
+}
+
+function renderCustomDictionaryBox(){
+  if(!customDictionaryBox) return;
+  customDictionaryBox.value = JSON.stringify(loadCustomNameDictionary(), null, 2);
+}
+
+function saveDictionaryFromBox(){
+  if(!customDictionaryBox) return;
+  try{
+    const parsed = JSON.parse(customDictionaryBox.value || '{}');
+    if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)){
+      throw new Error('O dicionário precisa ser um objeto JSON.');
+    }
+    localStorage.setItem(CUSTOM_NAME_DICTIONARY_KEY, JSON.stringify(parsed, null, 2));
+    renderCustomDictionaryBox();
+    setAdminStatus('Dicionário personalizado salvo neste navegador.', 'ok');
+  } catch(err){
+    setAdminStatus(`Erro no dicionário: ${err.message}`, 'error');
+  }
+}
+
+function clearDictionary(){
+  if(!confirm('Limpar o dicionário aprendido neste navegador?')) return;
+  localStorage.removeItem(CUSTOM_NAME_DICTIONARY_KEY);
+  renderCustomDictionaryBox();
+  setAdminStatus('Dicionário personalizado limpo.', 'ok');
 }
 
 function getImageExtension(file){
@@ -552,12 +662,71 @@ function renderBatchQueue(){
 
     const info = document.createElement('div');
     info.className = 'batchQueueInfo';
-    info.innerHTML = `
-      <strong>${index + 1}. ${entry.itemName}</strong>
-      <span>Frequência: ${entry.freq}</span>
-      <small>${entry.imagePath || `img/${slugifyFileName(entry.itemName)}.${entry.ext}`}</small>
-      ${entry.message ? `<em>${entry.message}</em>` : ''}
-    `;
+
+    const title = document.createElement('strong');
+    title.textContent = `${index + 1}. Item na fila`;
+
+    const nameLabel = document.createElement('label');
+    nameLabel.className = 'queueEditLabel';
+    nameLabel.innerHTML = '<span>Nome do item</span>';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = entry.itemName || '';
+    nameInput.disabled = entry.status === 'sending' || entry.status === 'done';
+    nameInput.addEventListener('change', () => {
+      const newName = nameInput.value.trim();
+      if(!newName) return;
+      entry.itemName = newName;
+      entry.imagePath = `img/${slugifyFileName(newName)}.${entry.ext || 'png'}`;
+      if(entry.sourceKey) learnNameCorrection(entry.sourceKey, newName);
+      saveBatchQueue();
+      renderBatchQueue();
+      setAdminStatus(`Correção aprendida: ${entry.sourceKey || entry.fileName} = ${newName}`, 'ok');
+    });
+    nameLabel.appendChild(nameInput);
+
+    const freqLabel = document.createElement('label');
+    freqLabel.className = 'queueEditLabel';
+    freqLabel.innerHTML = '<span>Frequência</span>';
+    const freqInput = document.createElement('input');
+    freqInput.type = 'number';
+    freqInput.min = '1000';
+    freqInput.max = '9999';
+    freqInput.value = entry.freq || '';
+    freqInput.disabled = entry.status === 'sending' || entry.status === 'done';
+    freqInput.addEventListener('change', () => {
+      const freq = freqInput.value.trim();
+      const validationItems = [...ITEMS, ...queueAsItems(entry.id)];
+      const error = validateFrequency(freq, validationItems, entry.itemName);
+      if(error){
+        setAdminStatus(error, 'error');
+        freqInput.value = entry.freq;
+        return;
+      }
+      entry.freq = String(freq);
+      entry.freqNum = Number(freq);
+      saveBatchQueue();
+      renderBatchQueue();
+      setAdminStatus(`Frequência de "${entry.itemName}" atualizada na fila.`, 'ok');
+    });
+    freqLabel.appendChild(freqInput);
+
+    const path = document.createElement('small');
+    path.textContent = entry.imagePath || `img/${slugifyFileName(entry.itemName)}.${entry.ext}`;
+
+    info.append(title, nameLabel, freqLabel, path);
+
+    if(entry.sourceKey){
+      const source = document.createElement('small');
+      source.textContent = `Origem: ${entry.sourceKey}`;
+      info.appendChild(source);
+    }
+
+    if(entry.message){
+      const message = document.createElement('em');
+      message.textContent = entry.message;
+      info.appendChild(message);
+    }
 
     const actions = document.createElement('div');
     actions.className = 'batchQueueActions';
@@ -565,6 +734,25 @@ function renderBatchQueue(){
     const status = document.createElement('span');
     status.className = `queueStatus ${entry.status || 'pending'}`;
     status.textContent = entry.status === 'done' ? 'Enviado' : entry.status === 'error' ? 'Erro' : entry.status === 'sending' ? 'Enviando' : 'Na fila';
+
+    const regen = document.createElement('button');
+    regen.className = 'ghost';
+    regen.type = 'button';
+    regen.textContent = 'Nova frequência';
+    regen.disabled = entry.status === 'sending' || entry.status === 'done';
+    regen.addEventListener('click', () => {
+      try{
+        const validationItems = [...ITEMS, ...queueAsItems(entry.id)];
+        const freq = gerarFrequenciaUnica(validationItems);
+        entry.freq = String(freq);
+        entry.freqNum = Number(freq);
+        saveBatchQueue();
+        renderBatchQueue();
+        setAdminStatus(`Nova frequência gerada para "${entry.itemName}".`, 'ok');
+      } catch(err){
+        setAdminStatus(`Erro: ${err.message}`, 'error');
+      }
+    });
 
     const remove = document.createElement('button');
     remove.className = 'ghost';
@@ -577,12 +765,11 @@ function renderBatchQueue(){
       renderBatchQueue();
     });
 
-    actions.append(status, remove);
+    actions.append(status, regen, remove);
     row.append(preview, info, actions);
     batchQueueList.appendChild(row);
   });
 }
-
 async function addCurrentItemToQueue(){
   const itemName = newItemName.value.trim();
   const freq = newItemFreq.value.trim();
@@ -654,7 +841,9 @@ async function addSelectedImagesToQueue(){
         continue;
       }
 
-      const itemName = inferItemNameFromFileName(file.name);
+      const inferred = inferItemDataFromFileName(file.name);
+      const itemName = inferred.itemName;
+      const sourceKey = inferred.sourceKey;
       if(!itemName){
         skipped++;
         errors.push(`${file.name}: não consegui definir o nome do item.`);
@@ -697,11 +886,13 @@ async function addSelectedImagesToQueue(){
         freqNum: Number(freq),
         ext,
         fileName: file.name,
+        sourceKey,
+        inferredByDictionary: inferred.learned,
         fileType: file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`,
         imagePath,
         imageContent,
         status: 'pending',
-        message: 'Adicionado automaticamente pelo nome da imagem.'
+        message: inferred.learned ? 'Nome reconhecido pelo dicionário. Revise antes de enviar.' : 'Nome criado pelo arquivo. Corrija na fila se necessário; o sistema aprende.'
       };
 
       batchQueue.push(entry);
@@ -731,6 +922,7 @@ async function addSelectedImagesToQueue(){
 }
 
 async function sendOneQueuedItem(entry){
+  if(entry.sourceKey) learnNameCorrection(entry.sourceKey, entry.itemName);
   const imageSha = await getExistingShaOrNull(entry.imagePath);
 
   await putGithubFile(
@@ -933,6 +1125,8 @@ addItemToQueue?.addEventListener('click', addCurrentItemToQueue);
 sendBatchQueue?.addEventListener('click', sendBatchQueueToGithub);
 clearBatchQueue?.addEventListener('click', clearQueue);
 addBulkImagesToQueue?.addEventListener('click', addSelectedImagesToQueue);
+saveCustomDictionary?.addEventListener('click', saveDictionaryFromBox);
+clearCustomDictionary?.addEventListener('click', clearDictionary);
 openAdminLogin?.addEventListener('click', () => {
   adminLoginBox.classList.toggle('hidden');
   if(!adminLoginBox.classList.contains('hidden')) adminPassword.focus();
@@ -950,6 +1144,7 @@ imageUpdateModal?.addEventListener('click', (event) => {
 });
 
 renderBatchQueue();
+renderCustomDictionaryBox();
 loadGithubConfig();
 suggestInitialFrequency();
 initAdminLogin();

@@ -132,6 +132,21 @@
         <p class="adminWarning">Dica: nomeie os arquivos com o nome do item, por exemplo <strong>Placa de circuito.png</strong> ou <strong>placa-de-circuito.png</strong>. Antes de enviar ao GitHub, revise a fila.</p>
       </section>
 
+      <section class="dictionaryPanel" id="dictionaryPanel">
+        <div class="batchHead">
+          <div>
+            <h3>Dicionário aprendido</h3>
+            <p>Quando você corrigir um nome na fila, o sistema aprende a relação entre o nome do arquivo e o nome do item.</p>
+          </div>
+          <div class="batchActions">
+            <button id="saveCustomDictionary" class="ghost" type="button">Salvar dicionário</button>
+            <button id="clearCustomDictionary" class="ghost" type="button">Limpar aprendido</button>
+          </div>
+        </div>
+        <textarea id="customDictionaryBox" class="customDictionaryBox" spellcheck="false" placeholder='{"HardDrive":"Disco Rígido"}'></textarea>
+        <p class="adminWarning">Esse dicionário fica salvo somente neste navegador. Ele não é enviado ao GitHub.</p>
+      </section>
+
       <section class="batchPanel" id="batchPanel">
         <div class="batchHead">
           <div>
