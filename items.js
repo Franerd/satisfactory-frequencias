@@ -468,6 +468,12 @@ const ITEMS = [
     "freqNum": 4981
   },
   {
+    "item": "Laço de Somer",
+    "freq": "6940",
+    "image": "img/laco-de-somer.png",
+    "freqNum": 6940
+  },
+  {
     "item": "Lesma Elétrica Amarela",
     "freq": "8157",
     "image": "img/lesma-eletrica-amarela.png",
