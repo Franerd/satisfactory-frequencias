@@ -546,6 +546,12 @@ const ITEMS = [
     "freqNum": 4897
   },
   {
+    "item": "Máscara de gás",
+    "freq": "6766",
+    "image": "img/mascara-de-gas.png",
+    "freqNum": 6766
+  },
+  {
     "item": "Massa Nuclear",
     "freq": "8916",
     "image": "img/massa-nuclear.png",
