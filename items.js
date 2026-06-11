@@ -792,6 +792,12 @@ const ITEMS = [
     "freqNum": 7629
   },
   {
+    "item": "Restos de Cuspidor",
+    "freq": "7037",
+    "image": "img/restos-de-cuspidor.png",
+    "freqNum": 7037
+  },
+  {
     "item": "Rotor",
     "freq": "1347",
     "image": "img/rotor-1.png",
